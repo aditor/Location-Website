@@ -24,13 +24,13 @@ name: {type: String, required: true},
 address: String,
 //no reviews when new location added to database, so default= 0
 //validation here too: min and max
-rating: {type: Number, "default": 0, min: 0, max: 5}
+rating: {type: Number, "default": 0, min: 0, max: 5},
 //array of string below
-facilities: [String]
+facilities: [String],
 //2dsphere: geometry based on spherical oject
-coords: {type: [Number], index: '2dsphere'}
+coords: {type: [Number], index: '2dsphere'},
 //nested subdocuments: an arrray of these apply to ONE location, ex. mon-fri, sat, sun
-openingTimes: [openingTimeSchema]
+openingTimes: [openingTimeSchema],
 //reviews for one location
 reviews: [reviewSchema]
 });
