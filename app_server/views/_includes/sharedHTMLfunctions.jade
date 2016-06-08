@@ -1,0 +1,9 @@
+//Here we're defining a mixin, almost like a javascript function for the STARS
+//need to use + when calling this function
+mixin outputRating(rating)
+                                         //output correct number of solid stars
+  - for (var i = 1; i <= rating; i++)
+  span.glyphicon.glyphicon-star
+                                         //output empty stars
+  - for (i = rating; i < 5; i++)
+  span.glyphicon.glyphicon-star-empty
