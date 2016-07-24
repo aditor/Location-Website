@@ -1,12 +1,11 @@
 var mongoose = require( 'mongoose' );
 
 
-
 var openingTimeSchema = new mongoose.Schema({
-days: {type: String, required: true},
-opening: String,
-closing: String,
-closed: {type: Boolean, required: true}
+	days: {type: String, required: true},
+	opening: String,
+	closing: String,
+	closed: {type: Boolean, required: true}
 });
 
 var reviewSchema = new mongoose.Schema({

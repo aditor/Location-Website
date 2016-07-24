@@ -1,4 +1,7 @@
 /* GET home page*/
+
+//CONTROLLERS
+
 //the first argument is the VIEW which is JADE format 
 //second argument is the Javascript object containing data to send to view
 //res.render Renders a view and sends the 
