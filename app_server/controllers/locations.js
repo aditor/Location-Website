@@ -1,3 +1,75 @@
+//request module: allow express to call API URLs, and interpret response
+var request = require('request');
+//default server url for local development
+var apiOptions = {
+    server : "http://localhost:3000"
+};
+//API call needs URL which differs based on environment, change node_env
+if (process.env.NODE_ENV === 'production') {
+    apiOptions.server = "https://getting-mean-loc8r.herokuapp.com";
+}
+
+//JUST the options
+/*var requestOptions = {
+    url : "http://yourapi.com/api/path",
+    method : "GET",
+    //body of request, only IF we are sending something to database, can even be empty object
+    json : {},
+    //query string parameters
+    qs : {
+        offset : 20
+    }
+};*/
+
+//uses options made above as first argument
+//calback runs when response comes back from API
+
+/*request(requestOptions, function(err, response, body) {
+    if (err) {
+    console.log(err);
+    } else if (response.statusCode === 200) {
+    console.log(body);
+    } else {
+    console.log(response.statusCode);
+    }
+});*/
+
+
+var renderHomepage = function(req, res, responseBody){
+    res.render('locations-list', {
+        title: 'Loc8r - find a place to work with wifi',
+        pageHeader: {
+            title: 'Loc8r',
+            strapline: 'Find places to work with wifi near you!'
+        },
+        sidebar: "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for.",
+        locations: responseBody
+    });
+};
+
+        //swapped bottom stuff out for "responseBody" above
+        /*[{
+            name: 'Starcups',
+            address: '125 High Street, Reading, RG6 1PS',
+            rating: 3,
+            facilities: ['Hot drinks', 'Food', 'Premium wifi'],
+            distance: '100m'
+        },{
+            name: 'Cafe Hero',
+            address: '125 High Street, Reading, RG6 1PS',
+            rating: 4,
+            facilities: ['Hot drinks', 'Food', 'Premium wifi'],
+            distance: '200m'
+        },{
+            name: 'Burger Queen',
+            address: '125 High Street, Reading, RG6 1PS',
+            rating: 2,
+            facilities: ['Food', 'Premium wifi'],
+            distance: '250m'
+        }]*/
+
+
+
 /* GET home page*/
 
 //CONTROLLERS
@@ -10,33 +82,42 @@
 //we're rendering an ARRAY of single location objects
 //array is called "locations", use for-each loop 
 module.exports.homelist= function(req, res){
-	res.render('locations-list', {
-		title: 'Loc8r - find a place to work with wifi',
-		pageHeader: {
-			title: 'Loc8r',
-			strapline: 'Find places to work with wifi near you!'
-		},
-        sidebar: "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for.",
-		locations: [{
-            name: 'Starcups',
-            address: '125 High Street, Reading, RG6 1PS',
-            rating: 3,
-            facilities: ['Hot drinks', 'Food', 'Premium wifi'],
-            distance: '100m'
-        },{
-        	name: 'Cafe Hero',
-        	address: '125 High Street, Reading, RG6 1PS',
-        	rating: 4,
-        	facilities: ['Hot drinks', 'Food', 'Premium wifi'],
-        	distance: '200m'
-        },{
-        	name: 'Burger Queen',
-        	address: '125 High Street, Reading, RG6 1PS',
-        	rating: 2,
-        	facilities: ['Food', 'Premium wifi'],
-        	distance: '250m'
-        }]
-    });
+	var requestOptions, path;
+    path = '/api/locations';
+    requestOptions = {
+        url : apiOptions.server + path,
+        method : "GET",
+        json : {},
+        qs : {
+            lng : -0.9690884,
+            lat : 51.455041,
+            maxDistance : 20
+        }
+    };
+    request(
+        requestOptions,
+        function(err, response, body) {
+            var i, data;
+            data = body;
+            for (i=0; i<data.length; i++) {
+                data[i].distance = _formatDistance(data[i].distance);
+            }
+            //render AFTER getting the info
+         renderHomepage(req, res, data);
+        }
+    );
+};
+
+var _formatDistance = function (distance) {
+    var numDistance, unit;
+    if (distance > 1) {
+        numDistance = parseFloat(distance).toFixed(1);
+        unit = 'km';
+    } else {
+        numDistance = parseInt(distance * 1000,10);
+        unit = 'm';
+    }
+    return numDistance + unit;
 };
 
 /* GET Location info page*/
