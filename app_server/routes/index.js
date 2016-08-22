@@ -10,11 +10,12 @@ var ctrlOthers = require('../controllers/others');
 //router.get function (request, response) - req. = URL, res = function
 //each function is a RES.RENDER function which renders the VIEW. OMG I get ITT
 router.get('/', ctrlLocations.homelist); //HOMEPAGE
-router.get('/location', ctrlLocations.locationInfo);
+router.get('/location/:locationid', ctrlLocations.locationInfo);
 router.get('/location/review/new', ctrlLocations.addReview);
 
 /*Other pages*/
 router.get('/about', ctrlOthers.about);
 
 module.exports = router;
+
 

@@ -130,8 +130,8 @@ module.exports.locationsReadOne = function (req, res) {
  //error check 1:check if params object exists, AND locationid exists in params object
   if(req.params && req.params.locationid){
     //(findById) get location id from URL parameters, pass it to findById method
-    Loc.findById(req.params.locationid).exec(function(err,location) { 
-                                           // (exec) define callback to accept possible parameters
+    Loc.findById(req.params.locationid)
+       .exec(function(err,location) { // (exec) define callback to accept possible parameters
         if(!location){ //if mongoose doesn't return location, exit function, error message
           sendJSONResponse(res, 404, {"message":"locationid not found"});
           return;
@@ -149,11 +149,76 @@ module.exports.locationsReadOne = function (req, res) {
 };
 
 module.exports.locationsUpdateOne = function (req, res) {
-  sendJSONResponse(res, 200, {"status" : "success"});
+  if (!req.params.locationid) {
+    sendJsonResponse(res, 404, {"message": "Not found, locationid is required"});
+    return;
+  }
+  Loc
+    .findById(req.params.locationid)
+    //dash means retrieve everything except this
+    //select normally means which columns we DO want to retrieve
+    .select('-reviews -rating')
+    .exec(
+      function(err, location) {
+       if (!location) {
+          sendJsonResponse(res, 404, {"message": "locationid not found"});
+          return;
+        } else if (err) {
+          sendJsonResponse(res, 400, err);
+          return;
+        }
+        //UPDATE the paths with values from SUBMITTED FORM
+        //When your query finds the document you
+        //get a model instance. If you make changes to this instance and then save it, Mongoose
+        //will update the original document in the database with your changes
+        location.name = req.body.name;
+        location.address = req.body.address;
+        location.facilities = req.body.facilities.split(",");
+        location.coords = [parseFloat(req.body.lng),
+                           parseFloat(req.body.lat)];
+        location.openingTimes = [{
+          days: req.body.days1,
+          opening: req.body.opening1,
+          closing: req.body.closing1,
+          closed: req.body.closed1,
+          }, {
+          days: req.body.days2,
+          opening: req.body.opening2,
+          closing: req.body.closing2,
+          closed: req.body.closed2,
+        }];
+        //SAVE INSTANCE
+        location.save(function(err, location) {
+          if (err) {
+          sendJsonResponse(res, 404, err);
+          } else {
+          sendJsonResponse(res, 200, location);
+          }
+        });
+      }
+    );
 };
 
+
 module.exports.locationsDeleteOne = function (req, res) {
-  sendJSONResponse(res, 200, {"status" : "success"});
+  var locationid = req.params.locationid;
+  if (locationid) {
+   Loc
+   //findbyidandremove is the mongoose delete function
+    .findByIdAndRemove(locationid)
+    .exec(
+      function(err, location) {
+        if (err) {
+          sendJsonResponse(res, 404, err);
+          return;
+        }
+        sendJsonResponse(res, 204, null);
+      }
+    );
+  } 
+  else {
+    sendJsonResponse(res, 404, {"message": "No locationid"});
+  }
 };
 
 

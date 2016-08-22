@@ -16,8 +16,9 @@
     "express": "~4.13.1",
     "jade": "~1.11.0",
     "mongoose": "^4.4.19",
-    "readline": "0.0.x",
     "morgan": "~1.6.1",
+    "readline": "0.0.x",
+    "request": "^2.74.0",
     "serve-favicon": "~2.3.0"
   }
 }
